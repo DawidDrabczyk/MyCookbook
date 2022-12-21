@@ -1,0 +1,13 @@
+<mat-card>
+  <form (submit)="onAddRecipe(recipeForm)" #recipeForm="ngForm">
+    <mat-form-field>
+      <input matInput type="text" name="title" ngModel #title="ngModel" required placeholder="Tytuł"/>
+      <mat-error *ngIf="title.invalid">Pole wymagane</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <textarea matInput rows="6" name="content" ngModel #content="ngModel" required placeholder="Opis"></textarea>
+      <mat-error *ngIf="content.invalid">Pole wymagane</mat-error>
+    </mat-form-field>
+    <button mat-raised-button color="primary" type="submit">Zapisz przepis</button>
+  </form>
+</mat-card>

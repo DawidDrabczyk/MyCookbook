@@ -1,0 +1,13 @@
+<mat-accordion multi="true" *ngIf="recipes.length > 0">
+  <mat-expansion-panel *ngFor="let recipe of recipes">
+    <mat-expansion-panel-header>
+        {{ recipe.title }}
+    </mat-expansion-panel-header>
+    <p>{{ recipe.content }}</p>
+    <mat-action-row>
+      <button mat-button color="primary">Edytuj</button>
+      <button mat-button color="warn">Usuń</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>
+<p class="mat-body-1 info_text" *ngIf="recipes.length === 0">Nie dodano żadnego przepisu.</p>
