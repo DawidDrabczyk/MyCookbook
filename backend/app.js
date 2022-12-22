@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const Recipe = require('./models/recipe');
+const recipeRoutes = require('./routes/recipes');
 
 const app = express();
 
@@ -24,35 +24,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/api/recipes', (req, res, next) => {
-  const recipe = new Recipe({
-    title: req.body.title,
-    content: req.body.content,
-  });
-  recipe.save().then((createdRecipe) => {
-    res.status(201).json({
-      message: 'Recipe added successfully!',
-      recipeId: createdRecipe._id
-    });
-  });
-});
-
-app.get('/api/recipes', (req, res, next) => {
-  Recipe.find().then((docs) => {
-    res.status(200).json({
-      message: 'Recipes fetched successfully!',
-      recipes: docs,
-    });
-  });
-});
-
-app.delete('/api/recipes:id', (req, res, next) => {
-  Recipe.deleteOne({ _id: req.params.id }).then((result) => {
-    console.log(result);
-    res.status(200).json({
-      message: 'Recipe deleted!',
-    });
-  });
-});
+app.use("/api/recipes", recipeRoutes);
 
 module.exports = app;

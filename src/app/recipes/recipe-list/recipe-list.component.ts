@@ -11,12 +11,15 @@ import { RecipeService } from 'src/app/services/recipe.service';
 export class RecipeListComponent implements OnInit, OnDestroy {
   recipes: Recipe[] = [];
   private subscription: Subscription;
+  isLoading: boolean = false;
 
   constructor(public recipeService: RecipeService) {}
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.recipeService.getRecipes();
     this.subscription = this.recipeService.getRecipesUpdated().subscribe((recipes: Recipe[]) => {
+      this.isLoading = false;
       this.recipes = recipes;
     });
   }

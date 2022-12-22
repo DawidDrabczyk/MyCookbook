@@ -9,17 +9,20 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AppComponent } from './app.component';
 import { RecipeCreateComponent } from './recipes/recipe-create/recipe-create.component';
 import { HeaderComponent } from './header/header.component';
 import { RecipeListComponent } from './recipes/recipe-list/recipe-list.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [AppComponent, RecipeCreateComponent, HeaderComponent, RecipeListComponent],
   imports: [
     BrowserModule,
     FormsModule,
+    AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
     MatInputModule,
@@ -28,6 +31,7 @@ import { RecipeListComponent } from './recipes/recipe-list/recipe-list.component
     MatButtonModule,
     MatToolbarModule,
     MatExpansionModule,
+    MatProgressSpinnerModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
