@@ -1,13 +1,17 @@
 <mat-card>
   <mat-spinner *ngIf="isLoading"></mat-spinner>
-  <form (submit)="onSaveRecipe(recipeForm)" #recipeForm="ngForm" *ngIf="!isLoading">
+  <form [formGroup]="form" (submit)="onSaveRecipe()" *ngIf="!isLoading">
     <mat-form-field>
-      <input matInput type="text" name="title" [ngModel]="recipe?.title" #title="ngModel" required placeholder="Tytuł"/>
-      <mat-error *ngIf="title.invalid">Pole wymagane</mat-error>
+      <input matInput formControlName="title" type="text" name="title" placeholder="Tytuł"/>
+      <mat-error *ngIf="form.get('title')?.invalid">Pole wymagane</mat-error>
     </mat-form-field>
+    <div>
+      <button mat-stroked-button type="button" (click)="filePicker.click()">Dodaj zdjęcie</button>
+      <input type="file" #filePicker>
+    </div>
     <mat-form-field>
-      <textarea matInput rows="6" name="content" [ngModel]="recipe?.content" #content="ngModel" required placeholder="Opis"></textarea>
-      <mat-error *ngIf="content.invalid">Pole wymagane</mat-error>
+      <textarea matInput formControlName="content" rows="6" name="content" placeholder="Opis"></textarea>
+      <mat-error *ngIf="form.get('content')?.invalid">Pole wymagane</mat-error>
     </mat-form-field>
     <button mat-raised-button color="primary" type="submit">Zapisz przepis</button>
   </form>
