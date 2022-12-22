@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { map, Subject } from 'rxjs';
 import { Recipe } from '../models/recipe.model';
 
 @Injectable({
@@ -14,9 +14,20 @@ export class RecipeService {
 
   getRecipes() {
     this.http
-      .get<{ message: string; recipes: Recipe[] }>('http://localhost:3000/api/recipes')
-      .subscribe((recipeData) => {
-        this.recipes = recipeData.recipes;
+      .get<{ message: string; recipes: any }>('http://localhost:3000/api/recipes')
+      .pipe(
+        map((recData) => {
+          return recData.recipes.map((singleRecipe) => {
+            return {
+              title: singleRecipe.title,
+              content: singleRecipe.content,
+              id: singleRecipe._id,
+            };
+          });
+        })
+      )
+      .subscribe((transformedData) => {
+        this.recipes = transformedData;
         this.recipesUpdated.next([...this.recipes]);
       });
   }
@@ -27,9 +38,20 @@ export class RecipeService {
 
   addRecipe(title: string, content: string) {
     const recipe: Recipe = { id: null, title: title, content: content };
-    this.http.post<{ message: string }>('http://localhost:3000/api/recipes', recipe).subscribe((res) => {
-      console.log(res.message);
-      this.recipes.push(recipe);
+    this.http
+      .post<{ message: string; recipeId: string }>('http://localhost:3000/api/recipes', recipe)
+      .subscribe((res) => {
+        const recipeId = res.recipeId;
+        recipe.id = recipeId;
+        this.recipes.push(recipe);
+        this.recipesUpdated.next([...this.recipes]);
+      });
+  }
+
+  deleteRecipe(recipeId: string) {
+    this.http.delete('http://localhost:3000/api/recipes' + recipeId).subscribe(() => {
+      const updateRecipes = this.recipes.filter((recipe) => recipe.id !== recipeId);
+      this.recipes = updateRecipes;
       this.recipesUpdated.next([...this.recipes]);
     });
   }
