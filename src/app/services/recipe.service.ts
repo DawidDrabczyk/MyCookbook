@@ -23,6 +23,7 @@ export class RecipeService {
               title: singleRecipe.title,
               content: singleRecipe.content,
               id: singleRecipe._id,
+              imagePath: singleRecipe.imagePath
             };
           });
         })
@@ -34,7 +35,7 @@ export class RecipeService {
   }
 
   updateRecipe(id: string, title: string, content: string) {
-    const recipe: Recipe = { id: id, title: title, content: content };
+    const recipe: Recipe = { id: id, title: title, content: content, imagePath: null };
     this.http.put('http://localhost:3000/api/recipes/' + id, recipe).subscribe((response) => {
       const updatedRecipes = [...this.recipes];
       const oldRecipeIndex = updatedRecipes.findIndex((r) => r.id === recipe.id);
@@ -45,20 +46,24 @@ export class RecipeService {
   }
 
   getRecipe(recipeId: string) {
-    return this.http.get<{_id: string; title: string; content: string}>('http://localhost:3000/api/recipes/' + recipeId);
+    return this.http.get<{ _id: string; title: string; content: string }>(
+      'http://localhost:3000/api/recipes/' + recipeId
+    );
   }
 
   getRecipesUpdated() {
     return this.recipesUpdated.asObservable();
   }
 
-  addRecipe(title: string, content: string) {
-    const recipe: Recipe = { id: null, title: title, content: content };
+  addRecipe(title: string, content: string, image: File) {
+    const recipeData = new FormData();
+    recipeData.append('title', title);
+    recipeData.append('content', content);
+    recipeData.append('image', image, title);
     this.http
-      .post<{ message: string; recipeId: string }>('http://localhost:3000/api/recipes', recipe)
+      .post<{ message: string; recipe: Recipe }>('http://localhost:3000/api/recipes', recipeData)
       .subscribe((res) => {
-        const recipeId = res.recipeId;
-        recipe.id = recipeId;
+        const recipe: Recipe = { id: res.recipe.id, title: title, content: content, imagePath: res.recipe.imagePath };
         this.recipes.push(recipe);
         this.copyAndBack();
       });
@@ -72,8 +77,8 @@ export class RecipeService {
     });
   }
 
-  copyAndBack(){
+  copyAndBack() {
     this.recipesUpdated.next([...this.recipes]);
-    this.router.navigate(['/'])
+    this.router.navigate(['/']);
   }
 }
