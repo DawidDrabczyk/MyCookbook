@@ -4,6 +4,9 @@
     <mat-expansion-panel-header>
         {{ recipe.title }}
     </mat-expansion-panel-header>
+    <div class="recipe_image">
+      <img [src]="recipe.imagePath" [alt]="recipe.title">
+    </div>
     <p>{{ recipe.content }}</p>
     <mat-action-row>
       <a mat-button color="primary" [routerLink]="['/edit', recipe.id]">Edytuj</a>

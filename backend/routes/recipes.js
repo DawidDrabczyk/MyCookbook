@@ -31,7 +31,7 @@ router.post('', multer({storage: storage}).single('image'), (req, res, next) => 
   const recipe = new Recipe({
     title: req.body.title,
     content: req.body.content,
-    imagePath: url + "/images" + req.file.filename
+    imagePath: url + "/images/" + req.file.filename
   });
   recipe.save().then((createdRecipe) => {
     res.status(201).json({
@@ -44,11 +44,17 @@ router.post('', multer({storage: storage}).single('image'), (req, res, next) => 
   });
 });
 
-router.put('/:id', (req, res, next) => {
+router.put('/:id', multer({storage: storage}).single('image'), (req, res, next) => {
+  let imagePath = req.body.imagePath;
+  if(req.file){
+    const url = req.protocol + '://' + req.get("host");
+    imagePath = url + "/images/" + req.file.filename
+  }
   const recipe = new Recipe({
     _id: req.body.id,
     title: req.body.title,
     content: req.body.content,
+    imagePath: imagePath
   });
   Recipe.updateOne({ _id: req.params.id }, recipe).then((result) => {
     res.status(200).json({

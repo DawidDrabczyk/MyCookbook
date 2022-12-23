@@ -15,7 +15,7 @@ export class RecipeService {
 
   getRecipes() {
     this.http
-      .get<{ message: string; recipes: any }>('http://localhost:3000/api/recipes')
+      .get<{ message: string; recipes: any }>('http://localhost:3000/api/recipes/')
       .pipe(
         map((recData) => {
           return recData.recipes.map((singleRecipe) => {
@@ -23,7 +23,7 @@ export class RecipeService {
               title: singleRecipe.title,
               content: singleRecipe.content,
               id: singleRecipe._id,
-              imagePath: singleRecipe.imagePath
+              imagePath: singleRecipe.imagePath,
             };
           });
         })
@@ -34,19 +34,34 @@ export class RecipeService {
       });
   }
 
-  updateRecipe(id: string, title: string, content: string) {
-    const recipe: Recipe = { id: id, title: title, content: content, imagePath: null };
+  updateRecipe(id: string, title: string, content: string, image: any) {
+    let recipe: Recipe | FormData;
+    if (typeof image === 'object') {
+      recipe = new FormData();
+      recipe.append('id', id),
+      recipe.append('title', title),
+      recipe.append('content', content),
+      recipe.append('image', image, title);
+    } else {
+      recipe = { id: id, title: title, content: content, imagePath: image };
+    }
     this.http.put('http://localhost:3000/api/recipes/' + id, recipe).subscribe((response) => {
       const updatedRecipes = [...this.recipes];
-      const oldRecipeIndex = updatedRecipes.findIndex((r) => r.id === recipe.id);
-      updatedRecipes[oldRecipeIndex] = recipe;
+      const oldRecipeIndex = updatedRecipes.findIndex((r) => r.id === id);
+      const recipeData: Recipe = {
+        id: id,
+        title: title,
+        content: content,
+        imagePath: '',
+      };
+      updatedRecipes[oldRecipeIndex] = recipeData;
       this.recipes = updatedRecipes;
       this.copyAndBack();
     });
   }
 
   getRecipe(recipeId: string) {
-    return this.http.get<{ _id: string; title: string; content: string }>(
+    return this.http.get<{ _id: string; title: string; content: string; imagePath: string }>(
       'http://localhost:3000/api/recipes/' + recipeId
     );
   }
