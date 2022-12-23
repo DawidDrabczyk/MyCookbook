@@ -26,35 +26,35 @@ const storage = multer.diskStorage({
   },
 });
 
-router.post('', multer({storage: storage}).single('image'), (req, res, next) => {
-  const url = req.protocol + '://' + req.get("host");
+router.post('', multer({ storage: storage }).single('image'), (req, res, next) => {
+  const url = req.protocol + '://' + req.get('host');
   const recipe = new Recipe({
     title: req.body.title,
     content: req.body.content,
-    imagePath: url + "/images/" + req.file.filename
+    imagePath: url + '/images/' + req.file.filename,
   });
   recipe.save().then((createdRecipe) => {
     res.status(201).json({
       message: 'Recipe added successfully!',
       recipe: {
         ...createdRecipe,
-        id: createdRecipe._id
-      }
+        id: createdRecipe._id,
+      },
     });
   });
 });
 
-router.put('/:id', multer({storage: storage}).single('image'), (req, res, next) => {
+router.put('/:id', multer({ storage: storage }).single('image'), (req, res, next) => {
   let imagePath = req.body.imagePath;
-  if(req.file){
-    const url = req.protocol + '://' + req.get("host");
-    imagePath = url + "/images/" + req.file.filename
+  if (req.file) {
+    const url = req.protocol + '://' + req.get('host');
+    imagePath = url + '/images/' + req.file.filename;
   }
   const recipe = new Recipe({
     _id: req.body.id,
     title: req.body.title,
     content: req.body.content,
-    imagePath: imagePath
+    imagePath: imagePath,
   });
   Recipe.updateOne({ _id: req.params.id }, recipe).then((result) => {
     res.status(200).json({
@@ -64,12 +64,25 @@ router.put('/:id', multer({storage: storage}).single('image'), (req, res, next) 
 });
 
 router.get('', (req, res, next) => {
-  Recipe.find().then((docs) => {
-    res.status(200).json({
-      message: 'Recipes fetched successfully!',
-      recipes: docs,
+  const pageSize = +req.query.pagesize;
+  const currentPage = +req.query.page;
+  const recipeQuery = Recipe.find();
+  let fetchedRecipes;
+  if (pageSize && currentPage) {
+    recipeQuery.skip(pageSize * (currentPage - 1)).limit(pageSize);
+  }
+  recipeQuery
+    .then((docs) => {
+      fetchedRecipes = docs;
+      return Recipe.count();
+    })
+    .then((count) => {
+      res.status(200).json({
+        message: 'Recipes fetched successfully!',
+        recipes: fetchedRecipes,
+        maxRecipes: count
+      });
     });
-  });
 });
 
 router.get('/:id', (req, res, next) => {

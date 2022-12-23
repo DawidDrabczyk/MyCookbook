@@ -14,4 +14,11 @@
     </mat-action-row>
   </mat-expansion-panel>
 </mat-accordion>
+<mat-paginator [length]="total"
+              [pageSize]="recipePerPage"
+              [pageSizeOptions]="pageSizeOptions"
+              (page)="onChangedPage($event)"
+              *ngIf="recipes.length > 0"
+              aria-label="Select page">
+</mat-paginator>
 <p class="mat-body-1 info_text" *ngIf="recipes.length === 0 && !isLoading">Nie dodano żadnego przepisu.</p>

@@ -9,28 +9,32 @@ import { Router } from '@angular/router';
 })
 export class RecipeService {
   private recipes: Recipe[] = [];
-  private recipesUpdated = new Subject<Recipe[]>();
+  private recipesUpdated = new Subject<{ recipes: Recipe[]; recipeCount: number }>();
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  getRecipes() {
+  getRecipes(recipesPerPage: number, currentPage: number) {
+    const queryParams = `?pagesize=${recipesPerPage}&page=${currentPage}`;
     this.http
-      .get<{ message: string; recipes: any }>('http://localhost:3000/api/recipes/')
+      .get<{ message: string; recipes: any; maxRecipes: number }>('http://localhost:3000/api/recipes/' + queryParams)
       .pipe(
         map((recData) => {
-          return recData.recipes.map((singleRecipe) => {
-            return {
-              title: singleRecipe.title,
-              content: singleRecipe.content,
-              id: singleRecipe._id,
-              imagePath: singleRecipe.imagePath,
-            };
-          });
+          return {
+            recipe: recData.recipes.map((singleRecipe) => {
+              return {
+                title: singleRecipe.title,
+                content: singleRecipe.content,
+                id: singleRecipe._id,
+                imagePath: singleRecipe.imagePath,
+              };
+            }),
+            maxRecipes: recData.maxRecipes,
+          };
         })
       )
-      .subscribe((transformedData) => {
-        this.recipes = transformedData;
-        this.recipesUpdated.next([...this.recipes]);
+      .subscribe((transformedRecipeData) => {
+        this.recipes = transformedRecipeData.recipe;
+        this.recipesUpdated.next({ recipes: [...this.recipes], recipeCount: transformedRecipeData.maxRecipes });
       });
   }
 
@@ -39,24 +43,15 @@ export class RecipeService {
     if (typeof image === 'object') {
       recipe = new FormData();
       recipe.append('id', id),
-      recipe.append('title', title),
-      recipe.append('content', content),
-      recipe.append('image', image, title);
+        recipe.append('title', title),
+        recipe.append('content', content),
+        recipe.append('image', image, title);
     } else {
       recipe = { id: id, title: title, content: content, imagePath: image };
     }
     this.http.put('http://localhost:3000/api/recipes/' + id, recipe).subscribe((response) => {
-      const updatedRecipes = [...this.recipes];
-      const oldRecipeIndex = updatedRecipes.findIndex((r) => r.id === id);
-      const recipeData: Recipe = {
-        id: id,
-        title: title,
-        content: content,
-        imagePath: '',
-      };
-      updatedRecipes[oldRecipeIndex] = recipeData;
-      this.recipes = updatedRecipes;
-      this.copyAndBack();
+
+      this.router.navigate(['/']);
     });
   }
 
@@ -78,22 +73,12 @@ export class RecipeService {
     this.http
       .post<{ message: string; recipe: Recipe }>('http://localhost:3000/api/recipes', recipeData)
       .subscribe((res) => {
-        const recipe: Recipe = { id: res.recipe.id, title: title, content: content, imagePath: res.recipe.imagePath };
-        this.recipes.push(recipe);
-        this.copyAndBack();
+
+        this.router.navigate(['/']);
       });
   }
 
   deleteRecipe(recipeId: string) {
-    this.http.delete('http://localhost:3000/api/recipes/' + recipeId).subscribe(() => {
-      const updateRecipes = this.recipes.filter((recipe) => recipe.id !== recipeId);
-      this.recipes = updateRecipes;
-      this.recipesUpdated.next([...this.recipes]);
-    });
-  }
-
-  copyAndBack() {
-    this.recipesUpdated.next([...this.recipes]);
-    this.router.navigate(['/']);
+    return this.http.delete('http://localhost:3000/api/recipes/' + recipeId);
   }
 }
