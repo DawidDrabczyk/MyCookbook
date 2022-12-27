@@ -3,11 +3,12 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const recipeRoutes = require('./routes/recipes');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
 mongoose
-  .connect('mongodb+srv://Dave:Angularbos734@meanapp.uya4l5f.mongodb.net/?retryWrites=true&w=majority')
+  .connect('mongodb+srv://Dave:Angularbos734@meanapp.uya4l5f.mongodb.net/&w=majority')
   .then(() => {
     console.log('Connected to database!');
   })
@@ -27,5 +28,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/auth', authRoutes);
 
 module.exports = app;

@@ -17,9 +17,11 @@ import { RecipeCreateComponent } from './recipes/recipe-create/recipe-create.com
 import { HeaderComponent } from './header/header.component';
 import { RecipeListComponent } from './recipes/recipe-list/recipe-list.component';
 import { AppRoutingModule } from './app-routing.module';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
 
 @NgModule({
-  declarations: [AppComponent, RecipeCreateComponent, HeaderComponent, RecipeListComponent],
+  declarations: [AppComponent, RecipeCreateComponent, HeaderComponent, RecipeListComponent, LoginComponent, SignupComponent],
   imports: [
     BrowserModule,
     FormsModule,
