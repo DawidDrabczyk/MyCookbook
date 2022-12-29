@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,9 +19,17 @@ import { RecipeListComponent } from './recipes/recipe-list/recipe-list.component
 import { AppRoutingModule } from './app-routing.module';
 import { LoginComponent } from './auth/login/login.component';
 import { SignupComponent } from './auth/signup/signup.component';
+import { AuthInterceptor } from './auth/auth-interceptor';
 
 @NgModule({
-  declarations: [AppComponent, RecipeCreateComponent, HeaderComponent, RecipeListComponent, LoginComponent, SignupComponent],
+  declarations: [
+    AppComponent,
+    RecipeCreateComponent,
+    HeaderComponent,
+    RecipeListComponent,
+    LoginComponent,
+    SignupComponent,
+  ],
   imports: [
     BrowserModule,
     FormsModule,
@@ -38,7 +46,7 @@ import { SignupComponent } from './auth/signup/signup.component';
     MatProgressSpinnerModule,
     MatPaginatorModule,
   ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
