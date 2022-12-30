@@ -9,6 +9,6 @@
       <input matInput type="password" autocomplete="off" name="password" placeholder="Hasło" ngModel #passwordInput="ngModel" required />
       <mat-error *ngIf="passwordInput.invalid">Pole wymagane</mat-error>
     </mat-form-field>
-    <button mat-raised-button color="primary" type="submit">Zaloguj</button>
+    <button mat-raised-button color="primary" type="submit" *ngIf="!isLoading">Zaloguj</button>
   </form>
 </mat-card>
