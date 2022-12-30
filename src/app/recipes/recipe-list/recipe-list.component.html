@@ -8,7 +8,7 @@
       <img [src]="recipe.imagePath" [alt]="recipe.title">
     </div>
     <p>{{ recipe.content }}</p>
-    <mat-action-row *ngIf="userIsAuthenticated">
+    <mat-action-row *ngIf="userIsAuthenticated && userId === recipe.author">
       <a mat-button color="primary" [routerLink]="['/edit', recipe.id]">Edytuj</a>
       <button mat-button color="warn" (click)="onDelete(recipe.id)">Usuń</button>
     </mat-action-row>

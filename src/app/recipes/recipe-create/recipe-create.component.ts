@@ -15,7 +15,7 @@ export class RecipeCreateComponent implements OnInit {
   private mode: string = 'create';
   private recipeId;
   form: FormGroup;
-  recipe;
+  recipe: Recipe;
   isLoading: boolean = false;
   imagePreview: string;
 
@@ -39,6 +39,7 @@ export class RecipeCreateComponent implements OnInit {
             title: recipeData.title,
             content: recipeData.content,
             imagePath: recipeData.imagePath,
+            author: recipeData.author
           };
           this.form.setValue({ title: this.recipe.title, content: this.recipe.content, image: this.recipe.imagePath });
         });

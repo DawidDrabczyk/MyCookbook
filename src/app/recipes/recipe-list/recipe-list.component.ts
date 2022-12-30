@@ -19,12 +19,14 @@ export class RecipeListComponent implements OnInit, OnDestroy {
   total = 0;
   pageSizeOptions = [1, 2, 5, 10];
   userIsAuthenticated: boolean = false;
+  userId: string;
   private authSubscription: Subscription;
 
   constructor(public recipeService: RecipeService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.isLoading = true;
+    this.userId = this.authService.getUserId();
     this.recipeService.getRecipes(this.recipePerPage, this.currentPage);
     this.subscription = this.recipeService
       .getRecipesUpdated()
@@ -36,6 +38,7 @@ export class RecipeListComponent implements OnInit, OnDestroy {
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.authSubscription = this.authService.getAuthStatus().subscribe((isAuthenticated) => {
       this.userIsAuthenticated = isAuthenticated;
+      this.userId = this.authService.getUserId();
     });
   }
 

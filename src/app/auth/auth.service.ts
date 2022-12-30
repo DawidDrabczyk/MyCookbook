@@ -12,6 +12,7 @@ export class AuthService {
   private token: string;
   private authStatus = new Subject<boolean>();
   private tokenTimer: any;
+  private userId: string;
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -25,7 +26,7 @@ export class AuthService {
   login(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
     this.http
-      .post<{ token: string; expiresIn: number }>('http://localhost:3000/api/auth/login', authData)
+      .post<{ token: string; expiresIn: number; userId: string }>('http://localhost:3000/api/auth/login', authData)
       .subscribe((result) => {
         const token = result.token;
         this.token = token;
@@ -33,10 +34,11 @@ export class AuthService {
           const expiresInDuration = result.expiresIn;
           this.setAuthTimer(expiresInDuration);
           this.isAuthenticated = true;
+          this.userId = result.userId;
           this.authStatus.next(true);
           const presentTime = new Date();
           const expirationDate = new Date(presentTime.getTime() + expiresInDuration * 1000);
-          this.saveAuthData(token, expirationDate);
+          this.saveAuthData(token, expirationDate, this.userId);
           this.router.navigate(['/']);
         }
       });
@@ -54,9 +56,14 @@ export class AuthService {
     return this.isAuthenticated;
   }
 
+  getUserId() {
+    return this.userId;
+  }
+
   onLogout() {
     this.token = null;
     this.isAuthenticated = false;
+    this.userId = null;
     this.authStatus.next(false);
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
@@ -73,24 +80,28 @@ export class AuthService {
     if (expiresIn > 0) {
       this.token = authData.token;
       this.isAuthenticated = true;
+      this.userId = authData.userId;
       this.setAuthTimer(expiresIn / 1000);
       this.authStatus.next(true);
     }
   }
 
-  private saveAuthData(token: string, expirationDate: Date) {
+  private saveAuthData(token: string, expirationDate: Date, userId: string) {
     localStorage.setItem('token', token);
     localStorage.setItem('expirationDate', expirationDate.toISOString());
+    localStorage.setItem('userId', userId);
   }
 
   private clearAuthData() {
     localStorage.removeItem('token');
     localStorage.removeItem('expirationDate');
+    localStorage.removeItem('userId');
   }
 
   private getAuthData() {
     const token = localStorage.getItem('token');
     const expirationDate = localStorage.getItem('expirationDate');
+    const userId = localStorage.getItem('userId');
 
     if (!token || !expirationDate) {
       return null;
@@ -98,6 +109,7 @@ export class AuthService {
     return {
       token: token,
       expirationDate: new Date(expirationDate),
+      userId: userId,
     };
   }
 

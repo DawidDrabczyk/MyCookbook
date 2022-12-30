@@ -26,6 +26,7 @@ export class RecipeService {
                 content: singleRecipe.content,
                 id: singleRecipe._id,
                 imagePath: singleRecipe.imagePath,
+                author: singleRecipe.author
               };
             }),
             maxRecipes: recData.maxRecipes,
@@ -47,7 +48,7 @@ export class RecipeService {
         recipe.append('content', content),
         recipe.append('image', image, title);
     } else {
-      recipe = { id: id, title: title, content: content, imagePath: image };
+      recipe = { id: id, title: title, content: content, imagePath: image, author: null };
     }
     this.http.put('http://localhost:3000/api/recipes/' + id, recipe).subscribe((response) => {
 
@@ -56,7 +57,7 @@ export class RecipeService {
   }
 
   getRecipe(recipeId: string) {
-    return this.http.get<{ _id: string; title: string; content: string; imagePath: string }>(
+    return this.http.get<{ _id: string; title: string; content: string; imagePath: string, author: string }>(
       'http://localhost:3000/api/recipes/' + recipeId
     );
   }

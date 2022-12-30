@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const Recipe = require('../models/recipe');
-const checkAuth = require('../middleware/check-auth')
+const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
@@ -33,6 +33,7 @@ router.post('', checkAuth, multer({ storage: storage }).single('image'), (req, r
     title: req.body.title,
     content: req.body.content,
     imagePath: url + '/images/' + req.file.filename,
+    author: req.userData.userId,
   });
   recipe.save().then((createdRecipe) => {
     res.status(201).json({
@@ -56,11 +57,18 @@ router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), (req
     title: req.body.title,
     content: req.body.content,
     imagePath: imagePath,
+    author: req.userData.userId
   });
-  Recipe.updateOne({ _id: req.params.id }, recipe).then((result) => {
-    res.status(200).json({
-      message: 'Update successful!',
-    });
+  Recipe.updateOne({ _id: req.params.id, author: req.userData.userId }, recipe).then((result) => {
+    if (result.modifiedCount > 0) {
+      res.status(200).json({
+        message: 'Update successful!',
+      });
+    } else {
+      res.status(401).json({
+        message: 'Not auhorized!',
+      });
+    }
   });
 });
 
@@ -81,7 +89,7 @@ router.get('', (req, res, next) => {
       res.status(200).json({
         message: 'Recipes fetched successfully!',
         recipes: fetchedRecipes,
-        maxRecipes: count
+        maxRecipes: count,
       });
     });
 });
@@ -99,11 +107,16 @@ router.get('/:id', (req, res, next) => {
 });
 
 router.delete('/:id', checkAuth, (req, res, next) => {
-  Recipe.deleteOne({ _id: req.params.id }).then((result) => {
-    console.log(result);
-    res.status(200).json({
-      message: 'Recipe deleted!',
-    });
+  Recipe.deleteOne({ _id: req.params.id, author: req.userData.userId }).then((result) => {
+    if (result.deletedCount > 0) {
+      res.status(200).json({
+        message: 'Post deleted!',
+      });
+    } else {
+      res.status(401).json({
+        message: 'Not auhorized!',
+      });
+    }
   });
 });
 
