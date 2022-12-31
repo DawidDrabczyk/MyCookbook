@@ -18,30 +18,40 @@ export class AuthService {
 
   createNewUser(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
-    this.http.post('http://localhost:3000/api/auth/signup', authData).subscribe((result) => {
-      console.log(result);
-    });
+    this.http.post('http://localhost:3000/api/auth/signup', authData).subscribe(
+      (result) => {
+        this.router.navigate(['/']);
+      },
+      (error) => {
+        this.authStatus.next(false);
+      }
+    );
   }
 
   login(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
     this.http
       .post<{ token: string; expiresIn: number; userId: string }>('http://localhost:3000/api/auth/login', authData)
-      .subscribe((result) => {
-        const token = result.token;
-        this.token = token;
-        if (token) {
-          const expiresInDuration = result.expiresIn;
-          this.setAuthTimer(expiresInDuration);
-          this.isAuthenticated = true;
-          this.userId = result.userId;
-          this.authStatus.next(true);
-          const presentTime = new Date();
-          const expirationDate = new Date(presentTime.getTime() + expiresInDuration * 1000);
-          this.saveAuthData(token, expirationDate, this.userId);
-          this.router.navigate(['/']);
+      .subscribe(
+        (result) => {
+          const token = result.token;
+          this.token = token;
+          if (token) {
+            const expiresInDuration = result.expiresIn;
+            this.setAuthTimer(expiresInDuration);
+            this.isAuthenticated = true;
+            this.userId = result.userId;
+            this.authStatus.next(true);
+            const presentTime = new Date();
+            const expirationDate = new Date(presentTime.getTime() + expiresInDuration * 1000);
+            this.saveAuthData(token, expirationDate, this.userId);
+            this.router.navigate(['/']);
+          }
+        },
+        (error) => {
+          this.authStatus.next(false);
         }
-      });
+      );
   }
 
   getToken() {
