@@ -1,0 +1,6 @@
+{
+  "env": {
+    "MONGO_ATLAS_PW": "Angularbos734",
+    "JWT_KEY": "this_is_very_top_secret_pass"
+  }
+}

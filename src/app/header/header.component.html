@@ -7,10 +7,10 @@
     <li *ngIf="userIsAuthenticated"><a mat-button routerLink="/create" routerLinkActive="mat-accent">Dodaj nowy przepis</a></li>
   </ul>
   <ul>
-    <li *ngIf="!userIsAuthenticated"><a mat-button routerLink="/signup" routerLinkActive="mat-accent">Zarejestruj się</a></li>
+    <li *ngIf="!userIsAuthenticated"><a mat-button routerLink="/auth/signup" routerLinkActive="mat-accent">Zarejestruj się</a></li>
   </ul>
   <ul>
-    <li *ngIf="!userIsAuthenticated"><a mat-button routerLink="/login" routerLinkActive="mat-accent">Zaloguj się</a></li>
+    <li *ngIf="!userIsAuthenticated"><a mat-button routerLink="/auth/login" routerLinkActive="mat-accent">Zaloguj się</a></li>
   </ul>
   <ul>
     <button *ngIf="userIsAuthenticated" mat-button (click)="onLogout()">Wyloguj się</button>

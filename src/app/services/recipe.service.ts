@@ -3,7 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { map, Subject } from 'rxjs';
 import { Recipe } from '../models/recipe.model';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
+const BE_URL = environment.apiUrl + '/recipes/'
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +18,7 @@ export class RecipeService {
   getRecipes(recipesPerPage: number, currentPage: number) {
     const queryParams = `?pagesize=${recipesPerPage}&page=${currentPage}`;
     this.http
-      .get<{ message: string; recipes: any; maxRecipes: number }>('http://localhost:3000/api/recipes/' + queryParams)
+      .get<{ message: string; recipes: any; maxRecipes: number }>(BE_URL + queryParams)
       .pipe(
         map((recData) => {
           return {
@@ -50,7 +52,7 @@ export class RecipeService {
     } else {
       recipe = { id: id, title: title, content: content, imagePath: image, author: null };
     }
-    this.http.put('http://localhost:3000/api/recipes/' + id, recipe).subscribe((response) => {
+    this.http.put(BE_URL + id, recipe).subscribe((response) => {
 
       this.router.navigate(['/']);
     });
@@ -58,7 +60,7 @@ export class RecipeService {
 
   getRecipe(recipeId: string) {
     return this.http.get<{ _id: string; title: string; content: string; imagePath: string, author: string }>(
-      'http://localhost:3000/api/recipes/' + recipeId
+      BE_URL + recipeId
     );
   }
 
@@ -72,7 +74,7 @@ export class RecipeService {
     recipeData.append('content', content);
     recipeData.append('image', image, title);
     this.http
-      .post<{ message: string; recipe: Recipe }>('http://localhost:3000/api/recipes', recipeData)
+      .post<{ message: string; recipe: Recipe }>(BE_URL, recipeData)
       .subscribe((res) => {
 
         this.router.navigate(['/']);
@@ -80,6 +82,6 @@ export class RecipeService {
   }
 
   deleteRecipe(recipeId: string) {
-    return this.http.delete('http://localhost:3000/api/recipes/' + recipeId);
+    return this.http.delete(BE_URL + recipeId);
   }
 }

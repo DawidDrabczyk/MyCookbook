@@ -2,7 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { AuthData } from './auth-data.model';
+
+const BE_URL = environment.apiUrl + '/auth/'
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +21,7 @@ export class AuthService {
 
   createNewUser(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
-    this.http.post('http://localhost:3000/api/auth/signup', authData).subscribe(
+    this.http.post(BE_URL + 'signup', authData).subscribe(
       (result) => {
         this.router.navigate(['/']);
       },
@@ -31,7 +34,7 @@ export class AuthService {
   login(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
     this.http
-      .post<{ token: string; expiresIn: number; userId: string }>('http://localhost:3000/api/auth/login', authData)
+      .post<{ token: string; expiresIn: number; userId: string }>(BE_URL + 'login', authData)
       .subscribe(
         (result) => {
           const token = result.token;
