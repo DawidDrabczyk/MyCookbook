@@ -41,7 +41,7 @@ exports.editRecipe = (req, res, next) => {
   });
   Recipe.updateOne({ _id: req.params.id, author: req.userData.userId }, recipe)
     .then((result) => {
-      if (result.modifiedCount > 0) {
+      if (result.matchedCount > 0) {
         res.status(200).json({
           message: 'Update successful!',
         });
