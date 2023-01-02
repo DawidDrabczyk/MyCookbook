@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 import { Recipe } from 'src/app/models/recipe.model';
 import { RecipeService } from 'src/app/services/recipe.service';
 import { mimeType } from '../../validators/mime-type-validators';
@@ -10,18 +12,22 @@ import { mimeType } from '../../validators/mime-type-validators';
   templateUrl: './recipe-create.component.html',
   styleUrls: ['./recipe-create.component.scss'],
 })
-export class RecipeCreateComponent implements OnInit {
+export class RecipeCreateComponent implements OnInit, OnDestroy {
   newRecipe: string = 'Brak dodanych przepisów!';
   private mode: string = 'create';
   private recipeId;
+  private authStatusSub: Subscription;
   form: FormGroup;
   recipe: Recipe;
   isLoading: boolean = false;
   imagePreview: string;
 
-  constructor(public recipeService: RecipeService, public activatedRoute: ActivatedRoute) {}
+  constructor(public recipeService: RecipeService, public activatedRoute: ActivatedRoute, private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.authStatusSub = this.authService.getAuthStatus().subscribe(authStatus => {
+      this.isLoading = false;
+    });
     this.form = new FormGroup({
       title: new FormControl(null, { validators: [Validators.required] }),
       content: new FormControl(null, { validators: [Validators.required] }),
@@ -48,6 +54,10 @@ export class RecipeCreateComponent implements OnInit {
         this.recipeId = null;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.authStatusSub.unsubscribe();
   }
 
   onSaveRecipe() {

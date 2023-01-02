@@ -21,8 +21,6 @@ router.post('/signup', (req, res, next) => {
       })
       .catch((err) => {
         res.status(500).json({
-            // message: 'Niepoprawne dane uwierzytelniające!'
-            error: err,
             message: 'Niepoprawne dane uwierzytelniające!'
           });
       });

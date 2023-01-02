@@ -35,15 +35,22 @@ router.post('', checkAuth, multer({ storage: storage }).single('image'), (req, r
     imagePath: url + '/images/' + req.file.filename,
     author: req.userData.userId,
   });
-  recipe.save().then((createdRecipe) => {
-    res.status(201).json({
-      message: 'Recipe added successfully!',
-      recipe: {
-        ...createdRecipe,
-        id: createdRecipe._id,
-      },
+  recipe
+    .save()
+    .then((createdRecipe) => {
+      res.status(201).json({
+        message: 'Recipe added successfully!',
+        recipe: {
+          ...createdRecipe,
+          id: createdRecipe._id,
+        },
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Dodanie przepisu nie powiodło się!',
+      });
     });
-  });
 });
 
 router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), (req, res, next) => {
@@ -57,19 +64,25 @@ router.put('/:id', checkAuth, multer({ storage: storage }).single('image'), (req
     title: req.body.title,
     content: req.body.content,
     imagePath: imagePath,
-    author: req.userData.userId
+    author: req.userData.userId,
   });
-  Recipe.updateOne({ _id: req.params.id, author: req.userData.userId }, recipe).then((result) => {
-    if (result.modifiedCount > 0) {
-      res.status(200).json({
-        message: 'Update successful!',
+  Recipe.updateOne({ _id: req.params.id, author: req.userData.userId }, recipe)
+    .then((result) => {
+      if (result.modifiedCount > 0) {
+        res.status(200).json({
+          message: 'Update successful!',
+        });
+      } else {
+        res.status(401).json({
+          message: 'Not auhorized!',
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Edycja nie powiodła się!',
       });
-    } else {
-      res.status(401).json({
-        message: 'Not auhorized!',
-      });
-    }
-  });
+    });
 });
 
 router.get('', (req, res, next) => {
@@ -91,33 +104,50 @@ router.get('', (req, res, next) => {
         recipes: fetchedRecipes,
         maxRecipes: count,
       });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Pobranie danych nie powiodło się!',
+      });
     });
 });
 
 router.get('/:id', (req, res, next) => {
-  Recipe.findById(req.params.id).then((recipe) => {
-    if (recipe) {
-      res.status(200).json(recipe);
-    } else {
-      res.status(404).json({
-        message: 'Recipe not found!',
+  Recipe.findById(req.params.id)
+    .then((recipe) => {
+      if (recipe) {
+        res.status(200).json(recipe);
+      } else {
+        res.status(404).json({
+          message: 'Recipe not found!',
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Pobranie danych nie powiodło się!',
       });
-    }
-  });
+    });
 });
 
 router.delete('/:id', checkAuth, (req, res, next) => {
-  Recipe.deleteOne({ _id: req.params.id, author: req.userData.userId }).then((result) => {
-    if (result.deletedCount > 0) {
-      res.status(200).json({
-        message: 'Post deleted!',
+  Recipe.deleteOne({ _id: req.params.id, author: req.userData.userId })
+    .then((result) => {
+      if (result.deletedCount > 0) {
+        res.status(200).json({
+          message: 'Post deleted!',
+        });
+      } else {
+        res.status(401).json({
+          message: 'Not auhorized!',
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Usunięcię danych nie powiodło się!',
       });
-    } else {
-      res.status(401).json({
-        message: 'Not auhorized!',
-      });
-    }
-  });
+    });
 });
 
 module.exports = router;

@@ -51,6 +51,8 @@ export class RecipeListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.recipeService.deleteRecipe(recipeId).subscribe(() => {
       this.recipeService.getRecipes(this.recipePerPage, this.currentPage);
+    }, () => {
+      this.isLoading = false;
     });
     this.currentPage = this.currentPage - 1;
   }
